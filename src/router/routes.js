@@ -1,16 +1,22 @@
+// src/router/routes.js
 const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
+    children: [
+      { path: '', redirect: '/login' },
+      { path: 'login', component: () => import('pages/common/LoginPage.vue') },
+      { path: 'enroll', component: () => import('pages/common/EnrollApp.vue') },
+      { path: 'certificate_ios', component: () => import('pages/ios/GetCertificateIOS.vue') },
+      { path: 'certificate_android', component: () => import('pages/android/GetCertificateAndroid.vue') }
+    ]
   },
 
-  // Always leave this as last one,
-  // but you can also remove it
+  // Always leave this as last one
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue'),
-  },
+    component: () => import('pages/ErrorNotFound.vue')
+  }
 ]
 
 export default routes

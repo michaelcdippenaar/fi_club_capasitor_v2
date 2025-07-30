@@ -1,32 +1,41 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+<!--      <q-toolbar>-->
+<!--        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />-->
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
+<!--        <q-toolbar-title> FiClub Connector </q-toolbar-title>-->
 
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
+<!--        <div>Quasar v{{ $q.version }}</div>-->
+<!--      </q-toolbar>-->
+      <div class="flex q-pt-md flex-center align-center justify-center">
+       <h4>FiClub </h4>
+      </div>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
+<!--    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>-->
+<!--      <q-list>-->
+<!--        <q-item-label header> Essential Links </q-item-label>-->
 
-        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
-      </q-list>
-    </q-drawer>
+<!--        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />-->
+<!--      </q-list>-->
+<!--    </q-drawer>-->
+
+
 
     <q-page-container>
+<!--          <login-page>-->
+
+<!--    </login-page>-->
       <router-view />
     </q-page-container>
   </q-layout>
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+import { defineComponent } from 'vue'
+// import EssentialLink from 'components/EssentialLink.vue'
+// import LoginPage from "pages/LoginPage.vue";
 
 const linksList = [
   {
@@ -77,7 +86,8 @@ export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    EssentialLink,
+    // LoginPage,
+    // EssentialLink,
   },
 
   data() {

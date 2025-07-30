@@ -18,6 +18,7 @@ export default defineConfig((/* ctx */) => {
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
+      'fontawesome-v6',
       // 'ionicons-v4',
       // 'mdi-v7',
       // 'fontawesome-v6',
@@ -79,6 +80,8 @@ export default defineConfig((/* ctx */) => {
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
       config: {},
+      iconSet: 'fontawesome-v6', // Quasar icon set
+
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack

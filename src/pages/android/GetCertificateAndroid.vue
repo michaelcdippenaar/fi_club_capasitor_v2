@@ -6,6 +6,7 @@
       <q-card-section>
         <div class="text-h6">Android Certificate Enrollment</div>
       </q-card-section>
+      <pre>{{ csr }}</pre>
 
 <!--      <q-card-section>-->
 <!--        <p v-if="loading">🔐Generating key pair...</p>-->
@@ -17,8 +18,15 @@
         <q-btn
           color="primary"
           label="Install Configuration Profile"
-          @click="testCustomPlugin"
+          @click="requestCSR"
         />
+<!--                <q-btn-->
+<!--          color="primary"-->
+<!--          label="Sign Data"-->
+<!--          @click="signData"-->
+<!--        />-->
+
+
       </q-card-actions>
     </q-card>
   </q-page>
@@ -43,10 +51,64 @@ import KeyPair from "src/utils/android/capacitor/keypair.js";
 
 export default defineComponent({
   name: 'GetCertificateAndroid',
+  data(){
+    return {
+      csr:'',
+      error:''
+  }},
   methods: {
-    testCustomPlugin(){
-      KeyPair.sayHello()
-    }
+    async generatePrivateKey() {
+      try {
+        await KeyPair.generateKeyPair();
+        console.log('✅ Key pair generated.');
+      } catch (error) {
+        console.error('❌ Key generation failed:', error);
+      }
+    },
+
+    async getPublicKey() {
+      try {
+        // Ensure key exists first
+        await this.generatePrivateKey();
+
+        // Now retrieve the public key
+        const result = await KeyPair.getPublicKey();
+        console.log('🔑 Public Key (Base64):', result.publicKey);
+      } catch (error) {
+        console.error('❌ Failed to get public key:', error);
+      }
+    },
+
+    async requestCSR() {
+    try {
+
+      await KeyPair.KeyPairGen.generateKeyPair();
+
+
+      const result = await KeyPair.KeyPairGen.getPublicKey()
+      console.log('🔑 Public Key (Base64):', result.publicKey);
+
+      const generated = await KeyPair.KeyPair.generateCSR();
+
+      this.csr = generated;
+      console.log('📜 CSR PEM:\n', this.csr);
+  } catch (err) {
+      this.error = err.message;
+      console.error('❌ Failed to generate CSR:', err);
+  }
+}
+
+  //   async signData() {
+  //     const message = 'Hello from Capacitor plugin!';
+  //     try {
+  //      await this.generatePrivateKey(); // Ensure key exists
+  //      const result = await KeyPair.signData({ data: message });
+  //      console.log('✍️ Signed message:', message);
+  //      console.log('🔏 Signature (Base64):', result.signature);
+  //   } catch (error) {
+  //      console.error('❌ Signing failed:', error);
+  //   }
+  // }
   }
 })
 

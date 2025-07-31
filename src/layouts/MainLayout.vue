@@ -8,7 +8,7 @@
 
 <!--        <div>Quasar v{{ $q.version }}</div>-->
 <!--      </q-toolbar>-->
-      <div class="flex q-pt-md flex-center align-center justify-center">
+      <div style="height: 120px" class="flex q-pt-sm flex-center align-center justify-center ">
        <h4>FiClub </h4>
       </div>
     </q-header>

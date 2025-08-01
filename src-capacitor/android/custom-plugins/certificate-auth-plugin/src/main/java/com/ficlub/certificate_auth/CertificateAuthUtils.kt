@@ -1,5 +1,5 @@
 // CertificateAuthUtils.kt
-package com.ficlub.keypair
+package com.ficlub.certificate_auth
 
 import java.io.StringReader
 import java.io.StringWriter
@@ -23,6 +23,17 @@ import org.bouncycastle.openssl.jcajce.JcaPEMWriter
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import org.bouncycastle.pkcs.PKCS10CertificationRequest
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder
+
+
+
+
+
+
+
+
+
+
+
 
 object CertificateAuthUtils {
 

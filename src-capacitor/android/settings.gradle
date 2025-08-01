@@ -5,4 +5,7 @@ project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor
 include ':custom-plugins:keypair-plugin'
 project(':custom-plugins:keypair-plugin').projectDir = new File('custom-plugins/keypair-plugin')
 
+include ':custom-plugins:certificate-auth-plugin'
+project(':custom-plugins:certificate-auth-plugin').projectDir = new File('custom-plugins/certificate-auth-plugin')
+
 apply from: 'capacitor.settings.gradle'

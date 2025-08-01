@@ -1,7 +1,7 @@
 // cert-api-client.js
 import axios from 'axios';
 
-const API_BASE = '/api';
+
 
 /**
  * Submit a PEM-encoded CSR to the Django backend.
@@ -12,7 +12,10 @@ const API_BASE = '/api';
  * @returns {Promise<{ certificate: string, certificate_chain: string, valid_until: string }>}
  */
 export async function submitCsr(csr, email, deviceId) {
-  const res = await axios.post(`${API_BASE}/csr/submit/`, { csr, email, device_id: deviceId });
+  const res = await axios.post(`/csr/submit/'`, { csr, email, device_id: deviceId });
+
+  console.log('[submitCsr]', JSON.parse(res.data));
+
   return res.data;
 }
 
@@ -23,7 +26,7 @@ export async function submitCsr(csr, email, deviceId) {
  * @returns {Promise<{ issued: boolean, valid_until?: string, revoked?: boolean }>}
  */
 export async function getCertStatus(deviceId) {
-  const res = await axios.get(`${API_BASE}/certs/status/`, { params: { device_id: deviceId } });
+  const res = await axios.get(`/certs/status/`, { params: { device_id: deviceId } });
   return res.data;
 }
 
@@ -35,7 +38,7 @@ export async function getCertStatus(deviceId) {
  * @returns {Promise<{ status: string, revoked_at: string }>}
  */
 export async function revokeCertificate(deviceId, reason = 'unspecified') {
-  const res = await axios.post(`${API_BASE}/certs/revoke/`, { device_id: deviceId, reason });
+  const res = await axios.post(`/certs/revoke/`, { device_id: deviceId, reason });
   return res.data;
 }
 
@@ -45,6 +48,6 @@ export async function revokeCertificate(deviceId, reason = 'unspecified') {
  * @returns {Promise<{ ca_cert: string }>}
  */
 export async function getCaRootCert() {
-  const res = await axios.get(`${API_BASE}/ca/root/`);
+  const res = await axios.get(`/ca/root/`);
   return res.data;
 }

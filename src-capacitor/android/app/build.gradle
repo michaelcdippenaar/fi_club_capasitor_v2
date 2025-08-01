@@ -41,6 +41,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
     implementation project(':custom-plugins:keypair-plugin')
+    implementation project(":custom-plugins:certificate-auth-plugin")
 }
 
 apply from: 'capacitor.build.gradle'

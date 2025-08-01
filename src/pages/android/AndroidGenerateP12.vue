@@ -63,7 +63,13 @@ export default {
           deviceId: this.deviceId,
           password: this.password
         })
-        console.log(response)
+        console.log('xxxxxxxxxxxxxxxxxxxxx')
+        console.log(response.data)
+         this.result = response?.status
+        ? `✅ Certificate installed with alias ${this.alias}`
+        : `⚠️ Installed, but no status returned`
+
+        // console.log(response)
         this.result = `✅ Certificate installed with alias ${this.alias}`
       } catch (err) {
         this.error = err?.message || 'Unknown error'

@@ -4,8 +4,8 @@ plugins {
 }
 
 android {
-    namespace 'com.ficlub.keypair'
-    compileSdk = 34
+    namespace = "com.ficlub.certificate_auth"
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 23
@@ -18,25 +18,18 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "21"
+        jvmTarget = "21" // This ensures Kotlin uses JDK 21
     }
+
 }
 
 dependencies {
-    // Capacitor Android core
-    implementation project(':capacitor-android')
+    implementation(project(":capacitor-android"))
 
-    // BouncyCastle cryptography libraries
-    implementation 'com.madgag.spongycastle:core:1.58.0.0'
-    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
-    implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
+    // BouncyCastle for cert & PEM support
+    implementation 'org.bouncycastle:bcprov-jdk15to18:1.81'
+    implementation 'org.bouncycastle:bcpkix-jdk15to18:1.81'
 
-    // AndroidX base
-    implementation "androidx.appcompat:appcompat:1.6.1"
-    implementation "androidx.core:core-ktx:1.12.0"
-    implementation "androidx.annotation:annotation:1.7.1"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.2"
-    implementation "androidx.fragment:fragment-ktx:1.6.1"
-    implementation "androidx.activity:activity:1.8.0"
+    implementation("androidx.core:core-ktx:1.16.0")
+    implementation("androidx.appcompat:appcompat:1.7.1")
 }
-include ':custom-plugins:certificate-auth-plugin'

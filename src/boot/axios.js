@@ -7,6 +7,17 @@ import axios from 'axios'
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
+
+axios.interceptors.request.use((config) => {
+  console.log('[API Request]', config);
+  return config;
+});
+
+axios.interceptors.response.use((response) => {
+  console.log('[API Response]', JSON.parse(response));
+  return response;
+});
+
 const api = axios.create({ baseURL: 'http://192.168.1.51:8000/quasar/api' })
 
 export default defineBoot(({ app }) => {

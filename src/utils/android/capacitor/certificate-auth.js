@@ -8,7 +8,14 @@
  * @returns {Promise<{ privateKeyPem: string, csrPem: string }>} PEM-encoded CSR and private key.
  */
 export async function generateCsrWithKey(alias, commonName) {
-  const result = await window.KeyPair.generateCsrWithExportableKey({ alias, commonName });
+  const plugin = window.Capacitor?.Plugins?.CertificateAuthPlugin
+
+  if (!plugin) {
+    throw new Error('[CertificateAuthPlugin] function generateCsrWithKey - CertificateAuthPlugin not available');
+  }
+
+  const result = await plugin.generateCsrWithExportableKey({ alias, commonName });
+
   return result;
 }
 
@@ -22,7 +29,12 @@ export async function generateCsrWithKey(alias, commonName) {
  * @returns {Promise<{ p12: string }>} Base64-encoded PKCS#12 file content.
  */
 export async function buildP12(alias, privateKey, certificate, password = '') {
-  const result = await window.KeyPair.buildP12Bundle({ alias, privateKey, certificate, password });
+  const plugin = window.Capacitor?.Plugins?.CertificateAuthPlugin
+  if (!plugin) {
+    throw new Error('[CertificateAuthPlugin] function buildP12 - CertificateAuthPlugin not available');
+  }
+
+  const result = await plugin.buildP12Bundle({ alias, privateKey, certificate, password });
   return result;
 }
 
@@ -36,5 +48,11 @@ export async function buildP12(alias, privateKey, certificate, password = '') {
  * @returns {Promise<void>} Resolves when the install intent is triggered.
  */
 export async function installP12(alias, p12, password = '') {
-  await window.KeyPair.installP12Certificate({ alias, p12, password });
+  const plugin = window.Capacitor?.Plugins?.CertificateAuthPlugin
+
+  if (!plugin) {
+    throw new Error('[CertificateAuthPlugin] function installP12 - CertificateAuthPlugin not available');
+  }
+
+  await plugin.installP12Certificate({ alias, p12, password });
 }

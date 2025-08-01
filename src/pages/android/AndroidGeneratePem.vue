@@ -41,7 +41,7 @@
               </q-item-section>
                     <q-separator spaced inset />
               <q-item-section side top>
-                 <q-icon v-if="certificateExistsLocally && certificateExistsPublic" name="check" color="green" />
+                 <q-icon v-if="certificateExistsLocally" name="check" color="green" />
               </q-item-section>
           </q-item>
       <q-separator spaced inset />
@@ -86,7 +86,6 @@ import WifiUtils from 'src/utils/android/capacitor/wifi';
 import { fileToBase64 } from 'src/utils/common/base64FileUtils';
 
 
-
 export default defineComponent({
   name: 'GetCertificateAndroid',
   data() {
@@ -95,6 +94,7 @@ export default defineComponent({
       csr: '',
       publicKey: '',
       pem509x: {},
+      serverCrt:{},
       certificateExistsLocally: false,
       certificateExistsPublic: false,
       p12File: null,
@@ -132,51 +132,62 @@ export default defineComponent({
       // await this.fetchServerCrt()
       await this.requestCSR()
       await this.postSignRequest()
-      await this.installSystemCertificate()
+      await this.installCert()
+      console.log('[KeyPairPlugin] ✅ setupWifiFlow');
+      await this.setupWifiFlow()
+      console.log('[KeyPairPlugin] ✅ Process Completed');
 
     },
     async installCert() {
-      if (!this.p12File) return;
+
+      try {
+
+        console.log('[KeyPairPlugin] Installing Certificate', this.pem509x.pem);
+
 
         const base64EncodedP12 = await fileToBase64(this.p12File);
-
         await KeyPair.installP12Certificate({
           alias: 'ficlub-key',
           p12: base64EncodedP12,
-          // password: 'your-password' // optional
+          password: '' // optional
         });
-      },
+        await WifiUtils.installCertificate('ficlub-key', this.pem509x.pem);
+        this.certificateExistsLocally = true;
+      } catch (err) {
+        this.certificateExistsLocally = false;
+        console.error('[KeyPairPlugin] ❌ Failed to install certificate:', err);
+      }
+    },
+
     async setupWifiFlow() {
+      console.log('[KeyPairPlugin] Start SetupWifiFlow');
     try {
-      await WifiUtils.installCertificate('ficlub-key', this.pem509x);
-      await KeyPair.connectToWifi({
-        ssid: '#FiClub',
-        identity: 'wifiuser',
-        clientAlias: 'ficlub-key',
-        caAlias: 'ficlub-ca'
-      });
+      await WifiUtils.connectToWifi(
+        '#FiClub', 'wifiuser', 'ficlub-key'
+      );
     } catch (err) {
-      console.error("❌ Setup failed", err);
+      console.error("[KeyPairPlugin] ❌ Setup failed", err);
     }
 },
-     async fetchServerCrt(){
+    async fetchServerCrt(){
         // Only for Development
         try {
           const response = await fetch('http://192.168.1.51:8000/quasar/api/wifi/android/private_crt/');
           const certPem = await response.text();
 
           console.log('📥 Received certificate:', certPem);
-
-          await Capacitor.Plugins.KeyPair.installSystemCertificate({
+          this.serverCrt = {
             alias: 'ficlub-key',
             certificate: certPem,
-          });
+          }
+          await Capacitor.Plugins.KeyPair.installSystemCertificate(this.serverCrt);
 
           console.log('✅ Certificate installation triggered');
         } catch (error) {
           console.error('❌ Error installing certificate:', error);
         }
       },
+
     async requestCSR() {
       this.csr = '';
       this.publicKey = '';
@@ -264,21 +275,21 @@ export default defineComponent({
       console.log('✅ Check Done');
     },
 
-    async installSystemCertificate(){
-      console.log('Installing Certificate', this.pem509x.pem);
-  try {
-    await KeyPairPlugin.installSystemCertificate({
-      alias: this.alias,
-      certificate: this.pem509x.pem,
-    });
-    this.certificateExistsPublic = true
-    console.log("✅ Certificate installation triggered.");
-  } catch (err) {
-    this.certificateExistsPublic = false
-    console.error("❌ Failed to install certificate:", err);
-  }
-
-    }
+  //   async installSystemCertificate(){
+  //
+  // try {
+  //   await KeyPairPlugin.installSystemCertificate({
+  //     alias: this.alias,
+  //     certificate: this.pem509x.pem,
+  //   });
+  //   this.certificateExistsPublic = true
+  //   console.log("✅ Certificate installation triggered.");
+  // } catch (err) {
+  //   this.certificateExistsPublic = false
+  //   console.error("❌ Failed to install certificate:", err);
+  // }
+  //
+  //   }
   }
 }
 );

@@ -5,7 +5,6 @@ package com.ficlub.keypair
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import android.util.Log
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
@@ -50,11 +49,9 @@ import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 
 import androidx.activity.result.contract.ActivityResultContracts
-import android.content.Intent
 import android.security.KeyChain
 
 
-import android.app.Activity
 
 import android.content.Context
 import android.net.wifi.WifiEnterpriseConfig
@@ -73,6 +70,8 @@ import android.net.wifi.WifiManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+
+
 
 @Suppress("DEPRECATION")
 @CapacitorPlugin(name = "KeyPair")
@@ -147,61 +146,61 @@ class KeyPairPlugin : Plugin() {
 
     @PluginMethod
     fun generateCSR(call: PluginCall) {
-            val alias = call.getString("alias") ?: "ficlub-key"
-            val subject = call.getString("subject") ?: "CN=wifiuser,O=Ficlub,C=ZA"
+        val alias = call.getString("alias") ?: "ficlub-key"
+        val subject = call.getString("subject") ?: "CN=wifiuser,O=Ficlub,C=ZA"
 
-            try {
-                Security.addProvider(BouncyCastleProvider())
-                val keyStore = KeyStore.getInstance("AndroidKeyStore")
-                keyStore.load(null)
+        try {
+            Security.addProvider(BouncyCastleProvider())
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
 
-                val privateKey = keyStore.getKey(alias, null) as? PrivateKey
-                    ?: throw IllegalStateException("Private key not found or invalid type")
+            val privateKey = keyStore.getKey(alias, null) as? PrivateKey
+                ?: throw IllegalStateException("Private key not found or invalid type")
 
-                val publicKey = keyStore.getCertificate(alias).publicKey as RSAPublicKey
+            val publicKey = keyStore.getCertificate(alias).publicKey as RSAPublicKey
 
-                val x500Name = X500Name(subject)
+            val x500Name = X500Name(subject)
 
-                val signature = Signature.getInstance("SHA256withRSA")
-                signature.initSign(privateKey)
+            val signature = Signature.getInstance("SHA256withRSA")
+            signature.initSign(privateKey)
 
-                val signer = object : ContentSigner {
-                    override fun getAlgorithmIdentifier() =
-                        org.spongycastle.asn1.x509.AlgorithmIdentifier(
-                            org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.sha256WithRSAEncryption
-                        )
+            val signer = object : ContentSigner {
+                override fun getAlgorithmIdentifier() =
+                    org.spongycastle.asn1.x509.AlgorithmIdentifier(
+                        org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers.sha256WithRSAEncryption
+                    )
 
-                    override fun getOutputStream(): OutputStream = object : OutputStream() {
-                        private val buffer = mutableListOf<Byte>()
+                override fun getOutputStream(): OutputStream = object : OutputStream() {
+                    private val buffer = mutableListOf<Byte>()
 
-                        override fun write(b: Int) {
-                            buffer.add(b.toByte())
-                        }
-
-                        override fun close() {
-                            signature.update(buffer.toByteArray())
-                        }
+                    override fun write(b: Int) {
+                        buffer.add(b.toByte())
                     }
 
-                    override fun getSignature(): ByteArray = signature.sign()
+                    override fun close() {
+                        signature.update(buffer.toByteArray())
+                    }
                 }
 
-                val builder = JcaPKCS10CertificationRequestBuilder(x500Name, publicKey)
-                val csr = builder.build(signer)
-
-                val csrEncoded = Base64.encodeToString(csr.encoded, Base64.NO_WRAP)
-                val ret = JSObject().apply {
-                    put("csr", csrEncoded)
-                }
-
-                Log.i("KeyPairPlugin", "✅ CSR generated successfully")
-                call.resolve(ret)
-
-            } catch (e: Exception) {
-                Log.e("KeyPairPlugin", "❌ Failed to generate CSR", e)
-                call.reject("CSR generation failed: ${e.message}")
+                override fun getSignature(): ByteArray = signature.sign()
             }
+
+            val builder = JcaPKCS10CertificationRequestBuilder(x500Name, publicKey)
+            val csr = builder.build(signer)
+
+            val csrEncoded = Base64.encodeToString(csr.encoded, Base64.NO_WRAP)
+            val ret = JSObject().apply {
+                put("csr", csrEncoded)
+            }
+
+            Log.i("KeyPairPlugin", "✅ CSR generated successfully")
+            call.resolve(ret)
+
+        } catch (e: Exception) {
+            Log.e("KeyPairPlugin", "❌ Failed to generate CSR", e)
+            call.reject("CSR generation failed: ${e.message}")
         }
+    }
 
 
     @PluginMethod
@@ -325,39 +324,11 @@ class KeyPairPlugin : Plugin() {
     }
 
     @PluginMethod
-    fun installP12Certificate(call: PluginCall) {
-        val alias = call.getString("alias") ?: return call.reject("Alias is required")
-        val p12Base64 = call.getString("p12") ?: return call.reject("Missing P12")
-        val password = call.getString("password") ?: ""
-
-        try {
-            val p12Bytes = Base64.decode(p12Base64, Base64.DEFAULT)
-
-            val intent = Intent("android.credentials.INSTALL").apply {
-                putExtra("name", alias)
-                putExtra("PFX", p12Bytes)
-                putExtra("PFX_PASSWORD", password)
-            }
-
-            bridge.activity?.let {
-                it.startActivity(intent)
-                call.resolve()
-            } ?: call.reject("Activity context is null")
-
-        } catch (e: Exception) {
-            Log.e("KeyPairPlugin", "❌ Failed to launch certificate install intent", e)
-            call.reject("Failed to install certificate: ${e.message}")
-        }
-    }
-
-
-
-
-    @PluginMethod
     fun forWifiInstallCertificates(call: PluginCall) {
         try {
             val alias = call.getString("alias") ?: return call.reject("Alias is required")
-            val certPem = call.getString("certificate") ?: return call.reject("Certificate PEM is required")
+            val certPem =
+                call.getString("certificate") ?: return call.reject("Certificate PEM is required")
 
             // Decode PEM to X509Certificate
             val certBytes = Base64.decode(
@@ -373,11 +344,13 @@ class KeyPairPlugin : Plugin() {
             ks.load(null)
 
             // Check if private key exists
-            val privateKey = ks.getKey(alias, null) ?: return call.reject("Private key not found for alias: $alias")
+            val privateKey = ks.getKey(alias, null)
+                ?: return call.reject("Private key not found for alias: $alias")
 
             // Create cert chain and install
             val certChain = arrayOf(cert)
-            ks.setEntry(alias,
+            ks.setEntry(
+                alias,
                 KeyStore.PrivateKeyEntry(privateKey as PrivateKey, certChain),
                 null
             )
@@ -388,50 +361,104 @@ class KeyPairPlugin : Plugin() {
             call.reject("Certificate install error: ${e.localizedMessage}")
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.Q)
     @PluginMethod
     fun setupWifi(call: PluginCall) {
+        Log.i("KeyPairPlugin", "📶 setupWifi called")
+
+        val ssid = call.getString("ssid") ?: return call.reject("SSID is required")
+        val alias = call.getString("alias") ?: return call.reject("Alias is required")
+        val identity = call.getString("identity") ?: "wifiuser"
+
+        Log.i(
+            "KeyPairPlugin",
+            "📶 setupWifi variables set: ssid=$ssid, identity=$identity, alias=$alias"
+        )
+
+        // 1. Retrieve private key and cert chain from KeyChain
+        val privateKey: PrivateKey?
+        val certChain: Array<java.security.cert.X509Certificate>?
 
         try {
-            val ssid = call.getString("ssid") ?: return call.reject("SSID is required")
-            val alias = call.getString("alias") ?: return call.reject("Alias is required")
-            val identity = call.getString("identity") ?: "wifiuser"
+            privateKey = KeyChain.getPrivateKey(context, alias)
+            certChain = KeyChain.getCertificateChain(context, alias)
+            Log.i("KeyPairPlugin", "✅ Retrieved key and cert chain from KeyChain")
+        } catch (e: Exception) {
+            Log.e("KeyPairPlugin", "❌ Failed to retrieve key/cert from KeyChain", e)
+            call.reject("KeyChain access error: ${e.localizedMessage}")
+            return
+        }
 
+        if (privateKey == null || certChain == null || certChain.isEmpty()) {
+            Log.e("KeyPairPlugin", "❌ Private key or certificate chain is missing")
+            Log.e("KeyPairPlugin", "❌❌❌ privateKey $privateKey certChain $certChain")
+            call.reject("Invalid alias or missing certificate")
+            return
+        }
+
+        try {
+            // 2. Build WifiEnterpriseConfig for EAP-TLS
             val wifiConfig = WifiEnterpriseConfig().apply {
+                Log.i("KeyPairPlugin", "✅ Inside wifiConfig.apply")
                 eapMethod = WifiEnterpriseConfig.Eap.TLS
                 phase2Method = WifiEnterpriseConfig.Phase2.NONE
-                caCertificateAlias = alias
-                clientCertificateAlias = alias
-                identity = identity
+
+                Log.i("KeyPairPlugin", "✅ Setting client key entry with certificate chain")
+                setClientKeyEntryWithCertificateChain(privateKey, certChain)
+
+                Log.i("KeyPairPlugin", "✅ Setting CA certificate from chain")
+                setCaCertificate(certChain.last())
+
+                this.identity = identity
             }
 
+            // 3. Create the WifiNetworkSpecifier
             val wifiNetworkSpecifier = WifiNetworkSpecifier.Builder()
                 .setSsid(ssid)
                 .setWpa2EnterpriseConfig(wifiConfig)
                 .build()
 
+            Log.i("KeyPairPlugin", "📶 Built wifiNetworkSpecifier")
+
+            // 4. Create and issue the network request
             val request = NetworkRequest.Builder()
                 .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
                 .setNetworkSpecifier(wifiNetworkSpecifier)
                 .build()
 
             val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
             cm.requestNetwork(request, object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
-                    super.onAvailable(network)
+                    Log.i("KeyPairPlugin", "✅ Network available")
                     cm.bindProcessToNetwork(network)
                     call.resolve()
                 }
 
                 override fun onUnavailable() {
-                    super.onUnavailable()
+                    Log.i("KeyPairPlugin", "❌ Wi-Fi network unavailable")
                     call.reject("Wi-Fi network unavailable")
                 }
             })
+
         } catch (e: Exception) {
-            Log.e("WifiManager", "Wi-Fi setup failed", e)
+            Log.e("KeyPairPlugin", "❌ Wi-Fi setup failed", e)
             call.reject("Wi-Fi setup error: ${e.localizedMessage}")
         }
     }
-}
 
+    fun generateCSR(commonName: String, keyPair: KeyPair): PKCS10CertificationRequest {
+        val subject = X500Principal("CN=$commonName")
+
+        val signatureAlgorithm = "SHA256withRSA"
+
+        val contentSigner = JcaContentSignerBuilder(signatureAlgorithm)
+            .setProvider(BouncyCastleProvider())
+            .build(keyPair.private)
+
+        return JcaPKCS10CertificationRequestBuilder(subject, keyPair.public)
+            .build(contentSigner)
+    }
+
+}

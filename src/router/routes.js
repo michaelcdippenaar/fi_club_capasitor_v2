@@ -8,7 +8,9 @@ const routes = [
       { path: 'login', component: () => import('pages/common/LoginPage.vue') },
       { path: 'enroll', component: () => import('pages/common/EnrollApp.vue') },
       { path: 'certificate_ios', component: () => import('pages/ios/GetCertificateIOS.vue') },
-      { path: 'certificate_android', component: () => import('pages/android/AndroidGeneratePem.vue') }
+      { path: 'certificate_android', component: () => import('pages/android/AndroidGeneratePem.vue') },
+      { path: 'p12_android', component: () => import('pages/android/AndroidGenerateP12.vue') }
+
     ]
   },
 

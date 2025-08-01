@@ -1,0 +1,8 @@
+include ':app'
+include ':capacitor-cordova-android-plugins'
+project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
+
+include ':custom-plugins:keypair-plugin'
+project(':custom-plugins:keypair-plugin').projectDir = new File('custom-plugins/keypair-plugin')
+
+apply from: 'capacitor.settings.gradle'

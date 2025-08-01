@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.ficlub.keypair'
+    compileSdk = 34
+
+    defaultConfig {
+        minSdk = 23
+        targetSdk = 34
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    kotlinOptions {
+        jvmTarget = "21"
+    }
+}
+
+dependencies {
+    // Capacitor Android core
+    implementation project(':capacitor-android')
+
+    // BouncyCastle cryptography libraries
+    implementation 'com.madgag.spongycastle:core:1.58.0.0'
+    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
+    implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
+
+    // AndroidX base
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "androidx.core:core-ktx:1.12.0"
+    implementation "androidx.annotation:annotation:1.7.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.2"
+    implementation "androidx.fragment:fragment-ktx:1.6.1"
+    implementation "androidx.activity:activity:1.8.0"
+}
+include ':custom-plugins:certificate-auth-plugin'

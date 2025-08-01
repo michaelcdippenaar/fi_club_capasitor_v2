@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">fi_club_onboarding</string>
+    <string name="title_activity_main">fi_club_onboarding</string>
+    <string name="package_name">co.mcdippenaar.testapp</string>
+    <string name="custom_url_scheme">co.mcdippenaar.testapp</string>
+</resources>

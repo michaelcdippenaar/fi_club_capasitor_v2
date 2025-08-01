@@ -21,7 +21,7 @@ function goToGetCertificate() {
   }
 
   else if(getPlatform()==='android') {
-    router.push('/certificate_android')
+    router.push('/p12_android')
   }
 }
 </script>

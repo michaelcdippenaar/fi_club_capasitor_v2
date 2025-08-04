@@ -15,13 +15,29 @@ import { getPlatform } from 'src/utils/common/os.js'
 
 const router = useRouter()
 
-function goToGetCertificate() {
-  if(getPlatform()==='ios'){
-    router.push('/certificate')
-  }
+async function goToGetCertificate() {
+  const platform = getPlatform();
+  console.log('Detected platform:', platform); // Log to confirm 'android'
 
-  else if(getPlatform()==='android') {
-    router.push('/p12_android')
+  if (platform === 'ios') {
+    console.log('Redirecting to iOS certificate route');
+    await router.push('/certificate')
+      .then(() => console.log('iOS navigation successful'))
+      .catch(err => {
+        console.error('Navigation error (iOS):', err);
+        alert('Navigation failed: ' + err.message);
+      });
+  } else if (platform === 'android') {
+    console.log('Redirecting to Android setup'); // Confirm this logs
+    await router.push('/android_connect_ssid')
+      .then(() => console.log('Android navigation successful'))
+      .catch(err => {
+        console.error('Navigation error (Android):', err);
+        alert('Navigation failed: ' + err.message);
+      });
+  } else {
+    console.error('Unsupported platform:', platform);
+    alert('Unsupported platform: ' + platform);
   }
 }
 </script>

@@ -34,7 +34,10 @@ export async function buildP12(alias, privateKey, certificate, password = '') {
     throw new Error('[CertificateAuthPlugin] function buildP12 - CertificateAuthPlugin not available');
   }
 
-  const result = await plugin.buildP12Bundle({ alias, privateKey, certificate, password });
+  const result = await plugin.buildP12Bundle({ alias: alias,
+    privateKeyPem: privateKey,
+    certificatePem: certificate,
+    password: password });
   return result;
 }
 

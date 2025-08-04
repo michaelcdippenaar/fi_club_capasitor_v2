@@ -73,7 +73,6 @@ import androidx.core.content.ContextCompat
 
 
 
-@Suppress("DEPRECATION")
 @CapacitorPlugin(name = "KeyPair")
 class KeyPairPlugin : Plugin() {
 
@@ -145,7 +144,7 @@ class KeyPairPlugin : Plugin() {
 
 
     @PluginMethod
-    fun generateCSR(call: PluginCall) {
+    fun generateCsr(call: PluginCall) {
         val alias = call.getString("alias") ?: "ficlub-key"
         val subject = call.getString("subject") ?: "CN=wifiuser,O=Ficlub,C=ZA"
 
@@ -301,6 +300,9 @@ class KeyPairPlugin : Plugin() {
                 Base64.DEFAULT
             )
 
+            Log.d("KeyPairPlugin", "📜 Cleaned PEM length: ${certBytes}")
+             Log.d("KeyPairPlugin", "📜 Cleaned PEM preview: ${certBytes.take(60)}...")
+
             // Parse X.509 certificate
             val cert = CertificateFactory.getInstance("X.509")
                 .generateCertificate(ByteArrayInputStream(certBytes))
@@ -448,16 +450,16 @@ class KeyPairPlugin : Plugin() {
         }
     }
 
-    fun generateCSR(commonName: String, keyPair: KeyPair): PKCS10CertificationRequest {
+    fun generateCSR(commonName: String, KeyPair: KeyPair): PKCS10CertificationRequest {
         val subject = X500Principal("CN=$commonName")
 
         val signatureAlgorithm = "SHA256withRSA"
 
         val contentSigner = JcaContentSignerBuilder(signatureAlgorithm)
             .setProvider(BouncyCastleProvider())
-            .build(keyPair.private)
+            .build(KeyPair.private)
 
-        return JcaPKCS10CertificationRequestBuilder(subject, keyPair.public)
+        return JcaPKCS10CertificationRequestBuilder(subject, KeyPair.public)
             .build(contentSigner)
     }
 

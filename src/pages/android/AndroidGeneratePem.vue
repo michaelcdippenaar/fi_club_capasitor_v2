@@ -81,7 +81,7 @@ code {
 
 <script>
 import { defineComponent } from 'vue';
-import { KeyPair, KeyPairPlugin } from 'src/utils/android/capacitor/keypair.js';
+import { KeyPair, KeyPairPlugin } from 'src/utils/android/capacitor/key-utils.js';
 import WifiUtils from 'src/utils/android/capacitor/wifi';
 import { fileToBase64 } from 'src/utils/common/base64FileUtils';
 

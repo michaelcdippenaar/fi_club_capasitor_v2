@@ -5,11 +5,11 @@ plugins {
 
 android {
     namespace 'com.ficlub.keypair'
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 23
-        targetSdk = 34
+        minSdk = 29
+        targetSdk = 36
     }
 
     compileOptions {

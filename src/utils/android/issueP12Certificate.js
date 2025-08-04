@@ -26,10 +26,18 @@ export async function issueP12Certificate({ alias, commonName, email, deviceId, 
   // Step 2: submit CSR to backend
   const { certificate, certificate_chain } = await submitCsr(csrPem, email, deviceId);
 
-  console.log(certificate);
+  console.log('[certificate_chain] certificate_chain:', certificate_chain);
+
+  console.log('[certificate] certificate:', certificate);
+
 
   // Step 3: build .p12 bundle
-  const { p12 } = await buildP12(alias, privateKeyPem, certificate_chain, password);
+  const { p12 } = await buildP12(
+    alias,
+    privateKeyPem,
+    certificate,
+    password
+  );
 
   // Step 4: install into Android KeyChain
   await installP12(alias, p12, password);

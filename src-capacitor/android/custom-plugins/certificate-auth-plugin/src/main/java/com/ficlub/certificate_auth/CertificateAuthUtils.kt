@@ -26,15 +26,6 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder
 
 
 
-
-
-
-
-
-
-
-
-
 object CertificateAuthUtils {
 
     /**
@@ -50,13 +41,16 @@ object CertificateAuthUtils {
     /**
      * Generates a Certificate Signing Request (CSR) using a given Common Name and key pair.
      * @param commonName The CN to use for the CSR (e.g. user@domain.com).
-     * @param keyPair The RSA KeyPair (private + public) used to sign the request.
+     * @param keyPair The RSA KeyUtils (private + public) used to sign the request.
      * @return A PKCS10CertificationRequest (raw CSR object).
      */
     fun generateCSR(commonName: String, keyPair: KeyPair): PKCS10CertificationRequest {
         val subject = X500Principal("CN=$commonName")
-        val signer = JcaContentSignerBuilder("SHA256withRSA").setProvider(BouncyCastleProvider()).build(keyPair.private)
-        return JcaPKCS10CertificationRequestBuilder(subject, keyPair.public).build(signer)
+        val signer = JcaContentSignerBuilder("SHA256withRSA")
+            .setProvider(BouncyCastleProvider())
+            .build(keyPair.private)
+        return JcaPKCS10CertificationRequestBuilder(subject, keyPair.public)
+            .build(signer)
     }
 
     /**
@@ -89,7 +83,7 @@ object CertificateAuthUtils {
     fun parsePrivateKey(pem: String): PrivateKey {
         val parser = PEMParser(StringReader(pem))
         val obj = parser.readObject()
-        val converter = JcaPEMKeyConverter().setProvider("BC")
+        val converter = JcaPEMKeyConverter()
         return when (obj) {
             is PEMKeyPair -> converter.getKeyPair(obj).private
             is PrivateKeyInfo -> converter.getPrivateKey(obj)
@@ -105,7 +99,7 @@ object CertificateAuthUtils {
     fun parseCertificateChain(pem: String): Array<X509Certificate> {
         val certs = mutableListOf<X509Certificate>()
         val parser = PEMParser(StringReader(pem))
-        val converter = JcaX509CertificateConverter().setProvider("BC")
+        val converter = JcaX509CertificateConverter()
 
         var obj = parser.readObject()
         while (obj != null) {
@@ -134,4 +128,6 @@ object CertificateAuthUtils {
         ks.store(out, password.toCharArray())
         return out.toByteArray()
     }
+
 }
+

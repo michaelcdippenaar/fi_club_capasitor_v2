@@ -44,7 +44,7 @@ code {
 
 <script>
 import { defineComponent } from 'vue';
-import { KeyPair, KeyPairPlugin } from 'src/utils/android/capacitor/keypair.js';
+import { KeyPair, KeyPairPlugin } from 'src/utils/android/capacitor/key-utils.js';
 
 export default defineComponent({
   name: 'GetCertificateAndroid',
@@ -60,7 +60,7 @@ export default defineComponent({
   methods: {
       async fetchServerCrt(){
         try {
-          const response = await fetch('http://yourserver.com/api/download-cert/');
+          const response = await fetch('http://192.168.1.51:8000/quasar/api/csr/submit/');
           const certPem = await response.text();
 
           console.log('📥 Received certificate:', certPem);

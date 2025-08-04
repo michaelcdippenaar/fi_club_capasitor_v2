@@ -1,2 +1,16 @@
 npm run android:dev
 npm run ios:dev
+
+android-dev.sh
+
+
+
+./gradlew clean
+./gradlew build
+npx cap sync android
+
+./gradlew clean build --refresh-dependencies
+
+
+
+adb logcat | grep "Capacitor/Console"

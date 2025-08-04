@@ -1,18 +1,21 @@
+
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'  // Add if using Kotlin; ensures Kotlin support
 
 android {
+    compileSdk = 36 // Android 14
     namespace "co.mcdippenaar.testapp"
-    compileSdk rootProject.ext.compileSdkVersion
+
     defaultConfig {
         applicationId "co.mcdippenaar.testapp"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdk = 29  // Updated to 29 for API Q+ features (e.g., Wi-Fi suggestions)
+        targetSdk = 36
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
-             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
-             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+            // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
@@ -25,9 +28,11 @@ android {
 }
 
 repositories {
-    flatDir{
+    flatDir {
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
     }
+    google()  // Add if not present for AndroidX
+    mavenCentral()  // Add for broader repo access (e.g., BouncyCastle)
 }
 
 dependencies {
@@ -42,6 +47,18 @@ dependencies {
     implementation project(':capacitor-cordova-android-plugins')
     implementation project(':custom-plugins:keypair-plugin')
     implementation project(":custom-plugins:certificate-auth-plugin")
+    implementation project(':custom-plugins:wifi-configurator-plugin')
+
+    // Added for unresolved imports:
+    implementation 'androidx.annotation:annotation:1.8.0'  // For androidx.annotation.RequiresPermission, etc.
+
+    // Added for BouncyCastle in CertificateAuthUtils.kt
+    implementation 'org.bouncycastle:bcprov-jdk15to18:1.81'  // Updated from 1.78.1
+    implementation 'org.bouncycastle:bcutil-jdk15to18:1.81'  // Updated from 1.78.1
+    implementation 'org.bouncycastle:bcpkix-jdk15to18:1.81'  // Updated from 1.78.1
+
+    // If using Kotlin extensions (optional but recommended)
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"  // Replace $kotlin_version with your version, e.g., 2.0.10
 }
 
 apply from: 'capacitor.build.gradle'

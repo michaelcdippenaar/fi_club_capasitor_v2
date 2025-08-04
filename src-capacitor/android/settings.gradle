@@ -8,4 +8,7 @@ project(':custom-plugins:keypair-plugin').projectDir = new File('custom-plugins/
 include ':custom-plugins:certificate-auth-plugin'
 project(':custom-plugins:certificate-auth-plugin').projectDir = new File('custom-plugins/certificate-auth-plugin')
 
+include ':custom-plugins:wifi-configurator-plugin'
+project(':custom-plugins:wifi-configurator-plugin').projectDir = new File(rootDir, 'custom-plugins/network')
+
 apply from: 'capacitor.settings.gradle'

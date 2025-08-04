@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace = "com.ficlub.network"
+    compileSdk = 36
+
+    defaultConfig {
+        minSdk = 29
+        targetSdk = 36
+    }
+    buildFeatures {
+        // Enable buildConfig if needed
+        buildConfig = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    kotlinOptions {
+        jvmTarget = "21" // This ensures Kotlin uses JDK 21
+    }
+
+}
+
+
+dependencies {
+    implementation project(':capacitor-android')
+    implementation("androidx.annotation:annotation:1.7.1")
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+
+    // Optional: If you use logging or lifecycle
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.activity:activity-ktx:1.8.2")
+}
+
